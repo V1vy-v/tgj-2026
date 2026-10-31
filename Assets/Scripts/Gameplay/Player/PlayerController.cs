@@ -1,3 +1,4 @@
+using System;
 using Framework.Bootstrap;
 using Framework.Services.Input;
 using Framework.Services.UI;
@@ -20,6 +21,7 @@ namespace Gameplay.Player
         #region 状态
 
         private PlayerInputReader _inputReader;
+        private DialogueInputReader _dialogueInput;
         private PerformanceMode _performanceMode;
         private InputModeController _inputMode;
         private PlayerCameraRig _cameraRig;
@@ -29,6 +31,10 @@ namespace Gameplay.Player
         private PlayerVision _vision;
         private PlayerEnergy _energy;
         private PlayerPulse _pulse;
+        private PlayerDialogue _dialogue;
+
+        public PlayerDialogue Dialogue => _dialogue;
+        public event Action DialogueAdvanceRequested;
         
         public PerformanceMode PerformanceMode => _performanceMode;
         public PlayerInteractor Interactor => _interactor;
@@ -52,7 +58,7 @@ namespace Gameplay.Player
         [SerializeField] private CinemachineCamera cinemachineCamera;
         
         private bool _inMaze;
-
+        
         #endregion
 
         #region 生命周期
@@ -64,6 +70,7 @@ namespace Gameplay.Player
             _inputMode = new InputModeController(input);
             _inputReader = new PlayerInputReader(input.GetMap("Player"));
             _performanceMode = new PerformanceMode(_inputMode, input.GetMap("Performance"));
+            _dialogueInput = new DialogueInputReader(input.GetMap("Dialogue"));
 
             _cameraRig = new PlayerCameraRig(
                 _inputReader, orbitalFollow, mainCamera.transform, lookSensitivity, invertY);
@@ -71,8 +78,9 @@ namespace Gameplay.Player
                 controller, _inputReader, playerConfig, mainCamera.transform);
             _energy = new PlayerEnergy(
                 playerConfig.InitialEnergy, playerConfig.EnergyCapacity);
-            
-            var context = new PlayerContext(transform, _energy);
+            _dialogue = new PlayerDialogue();
+
+            var context = new PlayerContext(transform, _energy, StartDialogue);
             _interactor = new PlayerInteractor(
                 interactOrigin, context, interactableLayer, interactRadius);
 
@@ -88,6 +96,8 @@ namespace Gameplay.Player
                 Debug.LogError("[PlayerController] selfLight 或 cinemachineCamera 未赋值，视野切换不会生效");
             }
 
+            _dialogue.Ended += OnDialogueEnded;
+            _dialogueInput.AdvancePressed += OnDialogueAdvancePressed;
             _inputReader.InteractPressed += OnInteractPressed;
             _inputReader.PulsePressed += OnPulsePressed;
 
@@ -104,7 +114,13 @@ namespace Gameplay.Player
         private void Update()
         {
             _inputReader.Poll();
-            
+
+            if (_dialogue.IsActive)
+            {
+                _vision?.Tick(Time.deltaTime);
+                return;
+            }
+
             _cameraRig.Tick();
             _motor.Tick(Time.deltaTime);
             _interactor.Tick(_inputReader.ScrollValue);
@@ -114,6 +130,8 @@ namespace Gameplay.Player
         private void OnDestroy()
         {
             _inputReader.InteractPressed -= OnInteractPressed;
+            _dialogue.Ended -= OnDialogueEnded;
+            _dialogueInput.AdvancePressed -= OnDialogueAdvancePressed;
 
             _glasses?.Dispose();
             _vision?.Dispose();
@@ -121,6 +139,7 @@ namespace Gameplay.Player
             _performanceMode?.Dispose();
             _inputReader?.Dispose();
             _inputMode?.Dispose();
+            _dialogueInput.Dispose();
         }
 
         #endregion
@@ -155,6 +174,22 @@ namespace Gameplay.Player
             ScanRendererFeature.Instance?.StopPulse();
             MazeBlackoutFeature.SetEnabled(false);
         }
+        public bool StartDialogue(TextAsset script)
+        {
+            if (_dialogue.IsActive)
+                return false;
+
+            if (!_dialogue.Start(script))
+                return false;
+
+            _interactor.Suspend();
+            _inputMode.SwitchTo(InputMode.Dialogue);
+
+            var ui = GameRoot.Instance.Services.Get<IUIService>();
+            ui.OpenPopup<DialoguePopup>(this);
+
+            return true;
+        }
 
         #endregion
 
@@ -162,7 +197,26 @@ namespace Gameplay.Player
 
         private void OnInteractPressed()
         {
+            if (_dialogue.IsActive)
+                return;
+
             _interactor.TryInteract();
+        }
+        private void OnDialogueAdvancePressed()
+        {
+            if (!_dialogue.IsActive)
+                return;
+
+            DialogueAdvanceRequested?.Invoke();
+        }
+
+        private void OnDialogueEnded()
+        {
+            var ui = GameRoot.Instance.Services.Get<IUIService>();
+            ui.Close<DialoguePopup>();
+
+            _inputMode.SwitchTo(InputMode.Player);
+            _interactor.Resume();
         }
         
         private void OnPulsePressed()

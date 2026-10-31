@@ -20,7 +20,8 @@ MonoBehaviour:
     prefabs:
     - {fileID: 6687699115481370951, guid: ef6b5f3570801f74cabb8703d7cba08c, type: 3}
   - layer: 200
-    prefabs: []
+    prefabs:
+    - {fileID: 390817400968878765, guid: 034857717d25e694991da9f04b4d4b65, type: 3}
   - layer: 300
     prefabs:
     - {fileID: -9126205388854495088, guid: a14804f454049634488e1b5dde19a7b0, type: 3}

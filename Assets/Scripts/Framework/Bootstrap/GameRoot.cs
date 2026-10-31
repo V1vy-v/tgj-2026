@@ -3,6 +3,7 @@ using Framework.Core;
 using Framework.Services.Assets;
 using Framework.Services.Assets.Providers;
 using Framework.Services.Input;
+using Framework.Services.Localization;
 using Framework.Services.SceneFlow;
 using Framework.Services.UI;
 using UnityEngine;
@@ -44,10 +45,16 @@ namespace Framework.Bootstrap
 
         private void BuildManagers()
         {
+            // Order 5
             _managers.Add(new AssetManager(new YooAssetProvider("DefaultPackage")));
-            _managers.Add(new InputManager(Config.InputAsset));     // Order 10
-            _managers.Add(new SceneFlowManager());                  // Order 30
-            _managers.Add(new UIManager(Config.UIRoot, Config.UIRegistry)); // Order 40
+            // Order 10
+            _managers.Add(new InputManager(Config.InputAsset));
+            // Order 15
+            _managers.Add(new LocalizationManager(Config.LocalizationTables));
+            // Order 30
+            _managers.Add(new SceneFlowManager());
+            // Order 40
+            _managers.Add(new UIManager(Config.UIRoot, Config.UIRegistry));
         }
 
         private void OnDestroy()

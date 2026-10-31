@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bfe684761a9a831408ee1e0e400ac34c, type: 3}
+  m_Name: DialogTable
+  m_EditorClassIdentifier: Assembly-CSharp::Framework.Services.Localization.LocalizationTable
+  localizationGroups:
+  - key: speaker.npc1
+    textEn: mira
+    textCh: "\u7C73\u62C9"
+  - key: speaker.npc2
+    textEn: mira
+    textCh: "\u7C73\u62C9"
+  - key: speaker.npc3
+    textEn: mira
+    textCh: "\u7C73\u62C9"
+  - key: dialogue.npc1.001.text
+    textEn: Hello!
+    textCh: "\u4F60\u597D\u5440\uFF01"
+  - key: dialogue.npc1.002.text
+    textEn: You are so cute!
+    textCh: "\u4F60\u771F\u53EF\u7231\uFF01"
+  - key: dialogue.npc1.003.text
+    textEn: Goodbye!
+    textCh: "\u518D\u89C1\uFF01"

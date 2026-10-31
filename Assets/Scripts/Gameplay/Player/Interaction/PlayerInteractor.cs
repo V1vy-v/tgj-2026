@@ -21,6 +21,7 @@ namespace Gameplay.Player.Interaction
         private float _nextCheckTime;
         private float _scrollAccum;
         private float _nextScrollTime;
+        private bool _suspended;
 
         private IInteractable _interactable;
         private IReadOnlyList<InteractionOption> _options;
@@ -49,6 +50,8 @@ namespace Gameplay.Player.Interaction
 
         public void Tick(float scrollValue)
         {
+            if (_suspended)
+                return;
             if (_options != null && _options.Count > 0)
             {
                 _scrollAccum += scrollValue;
@@ -85,6 +88,24 @@ namespace Gameplay.Player.Interaction
             return true;
         }
 
+        public void Suspend()
+        {
+            _suspended = true;
+
+            _interactable = null;
+            _options = null;
+            _highlightedIndex = 0;
+
+            InteractableChanged?.Invoke(null);
+            OptionsChanged?.Invoke(Array.Empty<InteractionOption>(), 0);
+        }
+
+        public void Resume()
+        {
+            _suspended = false;
+            _nextCheckTime = 0f;
+        }
+        
         private void ExecuteOption()
         {
             var option = _options[_highlightedIndex];
@@ -93,7 +114,9 @@ namespace Gameplay.Player.Interaction
             if (success)
             {
                 _nextCheckTime = Time.time + CheckInterval;
-                Detect();
+
+                if (!_suspended)
+                    Detect();
             }
             else
             {

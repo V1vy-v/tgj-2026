@@ -1,0 +1,4 @@
+# NPC 1 对话
+speaker.npc1 | dialogue.npc1.001.text | 1
+speaker.npc1 | dialogue.npc1.002.text | 1
+speaker.npc1 | dialogue.npc1.003.text | 1

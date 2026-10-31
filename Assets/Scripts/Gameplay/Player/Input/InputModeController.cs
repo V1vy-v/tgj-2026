@@ -9,7 +9,7 @@ namespace Gameplay.Player.Input
         None,
         Player,
         NpcPerformance,
-        Menu,
+        Dialogue,
     }
 
     /// <summary>
@@ -21,6 +21,7 @@ namespace Gameplay.Player.Input
 
         private readonly InputActionMap _playerMap;
         private readonly InputActionMap _npcPerformanceMap;
+        private readonly InputActionMap _dialogueMap;
 
         private InputActionMap _currentMap;
         private bool _disposed;
@@ -40,6 +41,7 @@ namespace Gameplay.Player.Input
 
             _playerMap = inputService.GetMap("Player");
             _npcPerformanceMap = inputService.GetMap("Performance");
+            _dialogueMap = inputService.GetMap("Dialogue");
 
             SwitchTo(InputMode.Player);
         }
@@ -59,6 +61,7 @@ namespace Gameplay.Player.Input
             {
                 InputMode.Player => _playerMap,
                 InputMode.NpcPerformance => _npcPerformanceMap,
+                InputMode.Dialogue => _dialogueMap,
                 _ => null,
             };
             _currentMap?.Enable();

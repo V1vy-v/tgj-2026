@@ -1,8 +1,17 @@
-﻿namespace Framework.Services.Localization
+﻿using System;
+
+namespace Framework.Services.Localization
 {
+    public enum Language
+    {
+        English,
+        ChineseSimple,
+    }
     public interface ILocalizationService
     {
-        string Get(string key, string fallback = null);
-        bool TryGet(string key, out string value);
+        Language Language { get; }
+        string GetText(string key);
+        void SetLanguage(Language language);
+        event Action OnLanguageChanged;
     }
 }

@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using Framework.Services.Localization;
 using Framework.Services.UI;
 using UnityEngine;
 using UnityEngine.Audio;
@@ -10,17 +12,18 @@ namespace Framework.Bootstrap
     [CreateAssetMenu(menuName = "Framework/Bootstrap Config", fileName = "BootstrapConfig")]
     public class BootstrapConfig : ScriptableObject
     {
-        [FormerlySerializedAs("_inputAsset")]
         [SerializeField][Header("输入系统配置")]
         private InputActionAsset inputAsset;
         public InputActionAsset InputAsset => inputAsset;
 
-        [FormerlySerializedAs("_mainAudioMixer")]
         [SerializeField][Header("音频系统配置")]
         private AudioMixer mainAudioMixer;
         public AudioMixer MainAudioMixer => mainAudioMixer;
+
+        [SerializeField] [Header("文本配置")]
+        private List<LocalizationTable> localizationTables;
+        public List<LocalizationTable> LocalizationTables => localizationTables;
         
-        [FormerlySerializedAs("_uiRoot")]
         [SerializeField][Header("UI根节点预制体")]
         private GameObject uiRoot;
         public GameObject UIRoot => uiRoot;
